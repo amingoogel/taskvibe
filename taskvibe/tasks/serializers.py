@@ -19,6 +19,7 @@ class MoodSerializer(serializers.ModelSerializer):
         fields = ['id', 'mood', 'recorded_at']
 
 class GroupSerializer(serializers.ModelSerializer):
+    members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = Group
         fields = ['id', 'name', 'members', 'created_at']
