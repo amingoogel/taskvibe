@@ -2,9 +2,10 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Task, DailyPhoto, Mood, Group, Challenge
-from .serializers import TaskSerializer, DailyPhotoSerializer, MoodSerializer, GroupSerializer, ChallengeSerializer
+from .models import Task, DailyPhoto, Mood, Group, Challenge, Message
+from .serializers import TaskSerializer, DailyPhotoSerializer, MoodSerializer, GroupSerializer, ChallengeSerializer, MessageSerializer
 from .notifications import send_task_reminder, send_challenge_update
+from rest_framework.views import APIView
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
@@ -91,3 +92,10 @@ class ChallengeViewSet(viewsets.ModelViewSet):
                 'progress_percentage': (completed_tasks / challenge.target_tasks * 100) if challenge.target_tasks > 0 else 0
             })
         return Response(progress)
+
+class GroupMessagesView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, group_id):
+        messages = Message.objects.filter(group_id=group_id).order_by('-timestamp')[:50][::-1]
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data)

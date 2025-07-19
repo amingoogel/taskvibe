@@ -1,6 +1,37 @@
 body {
-    background-color: #f3f4f6;
+  background-color: #f3f4f6;
+  margin: 0;
+  padding: 0;
+  font-family: 'Vazirmatn', 'Roboto', Arial, sans-serif;
+}
+
+body.dark {
+  background-color: #18181b;
+  color: #f3f4f6;
+}
+
+/* حذف استایل‌های اضافی کارت و استفاده از MUI */
+.card {
+  /* حذف استایل کارت قدیمی */
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 1.5rem;
+}
+
+body.dark .card {
+  background-color: #27272a;
+  color: #f3f4f6;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 0.5rem !important;
   }
-  .card {
-    @apply bg-white rounded-lg shadow-md p-6 mb-6;
+  .MuiBox-root {
+    padding: 0.5rem !important;
   }
+  .MuiTypography-root {
+    font-size: 1rem !important;
+  }
+}

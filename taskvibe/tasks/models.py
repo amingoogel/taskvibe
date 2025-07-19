@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Task(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -12,6 +14,18 @@ class Task(models.Model):
         ('MEDIUM', 'Medium'),
         ('HIGH', 'High'),
     ])
+    priority = models.CharField(max_length=10, choices=[
+        ('LOW', 'Low'),
+        ('MEDIUM', 'Medium'),
+        ('HIGH', 'High'),
+    ], default='MEDIUM')
+    tags = models.CharField(max_length=200, blank=True, help_text='Comma-separated tags')
+    recurring = models.CharField(max_length=10, choices=[
+        ('NONE', 'None'),
+        ('DAILY', 'Daily'),
+        ('WEEKLY', 'Weekly'),
+        ('MONTHLY', 'Monthly'),
+    ], default='NONE')
     created_at = models.DateTimeField(auto_now_add=True)
     due_date = models.DateTimeField(null=True, blank=True)
 
@@ -58,3 +72,29 @@ class Challenge(models.Model):
 
     def __str__(self):
         return self.title
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+
+    def __str__(self):
+        return f"Profile of {self.user.username}"
+
+class Message(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='messages')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username}: {self.content[:30]}"
+
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+    else:
+        try:
+            instance.profile.save()
+        except Profile.DoesNotExist:
+            Profile.objects.create(user=instance)
