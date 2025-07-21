@@ -15,6 +15,7 @@ import GroupChallenge from './components/GroupChallenge';
 import Analytics from './components/Analytics';
 import Onboarding from './pages/Onboarding';
 import Settings from './pages/Settings';
+import Groups from './pages/Groups';
 import './App.css';
 import { useSelector } from 'react-redux';
 
@@ -33,6 +34,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/tasks" element={<TaskManager />} />
           <Route path="/calendar" element={<CalendarView />} />
+          <Route path="/groups" element={<Groups />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />
         </Route>

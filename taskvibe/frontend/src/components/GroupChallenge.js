@@ -11,12 +11,21 @@ import SendIcon from '@mui/icons-material/Send';
 import CircularProgress from '@mui/material/CircularProgress';
 import Tooltip from '@mui/material/Tooltip';
 import Fade from '@mui/material/Fade';
+import Autocomplete from '@mui/material/Autocomplete';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import IconButton from '@mui/material/IconButton';
 
 function GroupChallenge() {
   const [groups, setGroups] = useState([]);
   const [challenges, setChallenges] = useState([]);
   const [challengeUpdates, setChallengeUpdates] = useState([]);
   const [groupName, setGroupName] = useState('');
+  const [groupMembers, setGroupMembers] = useState([]);
+  const [userOptions, setUserOptions] = useState([]);
   const [challengeTitle, setChallengeTitle] = useState('');
   const [challengeDescription, setChallengeDescription] = useState('');
   const [challengeTarget, setChallengeTarget] = useState(5);
@@ -27,6 +36,9 @@ function GroupChallenge() {
   const [chatInput, setChatInput] = useState('');
   const chatBoxRef = React.useRef(null);
   const [loading, setLoading] = useState(true);
+  const [openManageDialog, setOpenManageDialog] = useState(false);
+  const [managedMembers, setManagedMembers] = useState([]);
+  const [currentGroup, setCurrentGroup] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -82,6 +94,35 @@ function GroupChallenge() {
     }
   }, []); // Only run once on mount
 
+  useEffect(() => {
+    if (selectedGroup) {
+      const group = groups.find(g => g.id === selectedGroup);
+      if (group) {
+        setCurrentGroup(group);
+        // Now `group.members` is an array of user objects
+        setManagedMembers(group.members || []);
+      }
+    } else {
+      setCurrentGroup(null);
+    }
+  }, [selectedGroup, groups]);
+
+
+  const handleUserSearch = async (event, value) => {
+    if (value.length < 2) {
+      setUserOptions([]);
+      return;
+    }
+    try {
+      const response = await axios.get(`http://localhost:8000/api/users/search/?q=${value}`);
+      // Filter out users that are already members
+      const currentMemberIds = managedMembers.map(m => m.id);
+      setUserOptions(response.data.filter(u => !currentMemberIds.includes(u.id)));
+    } catch (error) {
+      console.error('Error searching users:', error);
+    }
+  };
+
   const handleCreateGroup = async () => {
     if (!groupName.trim()) {
       setError('نام گروه را وارد کنید!');
@@ -89,13 +130,16 @@ function GroupChallenge() {
     }
     try {
       const response = await axios.post('http://localhost:8000/api/groups/', {
-        name: groupName
+        name: groupName,
+        member_ids: groupMembers.map(m => m.id),
       });
       setGroups([...groups, response.data]);
       setGroupName('');
+      setGroupMembers([]);
       setError('');
+      setSelectedGroup(response.data.id); // Select the new group
     } catch (error) {
-      setError(error.response?.data?.detail || error.response?.data?.error || 'ساخت گروه ناموفق بود!');
+      setError(error.response?.data?.detail || 'ساخت گروه ناموفق بود!');
     }
   };
 
@@ -137,6 +181,28 @@ function GroupChallenge() {
     }
   };
 
+  const handleOpenManageDialog = () => {
+    if (currentGroup) {
+      setUserOptions([]); // Reset search options
+      setManagedMembers(currentGroup.members || []);
+      setOpenManageDialog(true);
+    }
+  };
+
+  const handleUpdateMembers = async () => {
+    if (!currentGroup) return;
+    try {
+      const response = await axios.post(`http://localhost:8000/api/groups/${currentGroup.id}/manage_members/`, {
+        user_ids: managedMembers.map(m => m.id),
+      });
+      setGroups(groups.map(g => g.id === currentGroup.id ? response.data : g));
+      setOpenManageDialog(false);
+    } catch (error) {
+      setError('خطا در بروزرسانی اعضا');
+    }
+  };
+
+
   return (
     <Box sx={{ bgcolor: 'background.paper', borderRadius: 3, boxShadow: 3, p: 3, mb: 3 }}>
       <Typography variant="h6" fontWeight={700} gutterBottom>
@@ -151,6 +217,25 @@ function GroupChallenge() {
           onChange={e => setGroupName(e.target.value)}
           fullWidth
         />
+        <Autocomplete
+          multiple
+          options={userOptions}
+          getOptionLabel={(option) => option.username}
+          value={groupMembers}
+          onChange={(event, newValue) => {
+            setGroupMembers(newValue);
+          }}
+          onInputChange={handleUserSearch}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="افزودن اعضا"
+              placeholder="نام کاربری را برای جستجو وارد کنید"
+            />
+          )}
+          filterOptions={(x) => x}
+          noOptionsText="کاربری یافت نشد"
+        />
         <Button
           onClick={handleCreateGroup}
           variant="contained"
@@ -160,6 +245,28 @@ function GroupChallenge() {
         >
           ساخت گروه
         </Button>
+      </Stack>
+      <Divider sx={{ my: 2 }} />
+      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
+        <TextField
+            select
+            label="انتخاب گروه"
+            value={selectedGroup}
+            onChange={e => setSelectedGroup(e.target.value)}
+            fullWidth
+            >
+            <MenuItem value="">انتخاب گروه</MenuItem>
+            {groups.map(group => (
+                <MenuItem key={group.id} value={group.id}>{group.name}</MenuItem>
+            ))}
+        </TextField>
+        <Tooltip title="مدیریت اعضا">
+            <span>
+                <IconButton onClick={handleOpenManageDialog} disabled={!selectedGroup}>
+                    <ManageAccountsIcon />
+                </IconButton>
+            </span>
+        </Tooltip>
       </Stack>
       <Divider sx={{ my: 2 }} />
       <Stack spacing={2} sx={{ mb: 2 }}>
@@ -286,6 +393,36 @@ function GroupChallenge() {
           </Button>
         </Tooltip>
       </Box>
+
+      <Dialog open={openManageDialog} onClose={() => setOpenManageDialog(false)} fullWidth maxWidth="sm">
+        <DialogTitle>مدیریت اعضای گروه: {currentGroup?.name}</DialogTitle>
+        <DialogContent>
+            <Autocomplete
+                multiple
+                options={userOptions}
+                getOptionLabel={(option) => option.username}
+                value={managedMembers}
+                onChange={(event, newValue) => {
+                    setManagedMembers(newValue);
+                }}
+                onInputChange={handleUserSearch}
+                renderInput={(params) => (
+                    <TextField
+                    {...params}
+                    label="افزودن یا حذف اعضا"
+                    placeholder="نام کاربری را جستجو کنید"
+                    />
+                )}
+                filterOptions={(x) => x}
+                noOptionsText="کاربری یافت نشد"
+                sx={{mt:2}}
+            />
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={() => setOpenManageDialog(false)}>انصراف</Button>
+            <Button onClick={handleUpdateMembers} variant="contained">ذخیره تغییرات</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

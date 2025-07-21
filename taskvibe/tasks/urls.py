@@ -1,8 +1,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import TaskViewSet, DailyPhotoViewSet, MoodViewSet, GroupViewSet, ChallengeViewSet, GroupMessagesView
+from .views import TaskViewSet, DailyPhotoViewSet, MoodViewSet, GroupViewSet, ChallengeViewSet, GroupMessagesView, UserSearchView
 from .analytics import  TaskAnalyticsView
-from .auth_views import RegisterView, LoginView, ProfileView
+from .auth_views import RegisterView, LoginView, ProfileView, PasswordChangeView
 
 router = DefaultRouter()
 router.register(r'tasks', TaskViewSet)
@@ -18,4 +18,6 @@ urlpatterns = [
     path('analytics/', TaskAnalyticsView.as_view(), name='analytics'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('groups/<int:group_id>/messages/', GroupMessagesView.as_view(), name='group-messages'),
+    path('users/search/', UserSearchView.as_view(), name='user-search'),
+    path('password_change/', PasswordChangeView.as_view(), name='password-change'),
 ]

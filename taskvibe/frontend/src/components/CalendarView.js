@@ -10,6 +10,7 @@ import AddTaskIcon from '@mui/icons-material/AddTask';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import BoltIcon from '@mui/icons-material/Bolt';
+import DailyPhoto from './DailyPhoto';
 
 const locales = {
   'en-US': require('date-fns/locale/en-US'),
@@ -112,6 +113,17 @@ function CalendarView() {
     HIGH: '🔥',
   };
 
+  // فیلتر تسک‌های روز انتخاب‌شده
+  const isSameDay = (d1, d2) => {
+    if (!d1 || !d2) return false;
+    return d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate();
+  };
+  const filteredTasks = selectedDate
+    ? tasks.filter(task => isSameDay(new Date(task.start), selectedDate))
+    : [];
+
   return (
     <Box sx={{ bgcolor: 'background.paper', borderRadius: 3, boxShadow: 3, p: 3, mb: 3 }}>
       <Typography variant="h6" fontWeight={700} gutterBottom>
@@ -183,17 +195,19 @@ function CalendarView() {
       </Dialog>
       <Divider sx={{ my: 2 }} />
       <Typography variant="subtitle1" fontWeight={700} gutterBottom>
-        لیست تسک‌ها <span role="img" aria-label="list">📋</span>
+        {selectedDate ? `تسک‌های ${selectedDate.toLocaleDateString('fa-IR')}` : 'یک روز را از تقویم انتخاب کنید'} <span role="img" aria-label="list">📋</span>
       </Typography>
       {loading ? (
         <Box display="flex" justifyContent="center" alignItems="center" minHeight={80}>
           <CircularProgress />
         </Box>
-      ) : tasks.length === 0 ? (
-        <Typography color="text.secondary" align="center" sx={{ my: 2 }}>تسکی برای نمایش وجود ندارد.</Typography>
+      ) : !selectedDate ? (
+        <Typography color="text.secondary" align="center" sx={{ my: 2 }}>لطفاً یک روز را از تقویم انتخاب کنید.</Typography>
+      ) : filteredTasks.length === 0 ? (
+        <Typography color="text.secondary" align="center" sx={{ my: 2 }}>تسکی برای این روز وجود ندارد.</Typography>
       ) : (
         <List>
-          {tasks.map((task, i) => (
+          {filteredTasks.map((task, i) => (
             <Fade in timeout={400 + i * 50} key={task.id}>
               <Tooltip title={task.title} arrow>
                 <ListItem
@@ -239,6 +253,12 @@ function CalendarView() {
             </Fade>
           ))}
         </List>
+      )}
+      {/* نمایش عکس روز برای روز انتخاب‌شده */}
+      {selectedDate && (
+        <Box sx={{mt:3}}>
+          <DailyPhoto date={selectedDate} />
+        </Box>
       )}
     </Box>
   );

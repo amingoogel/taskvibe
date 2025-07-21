@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Box, Typography, Paper, Stack, TextField, Button, Divider, Switch, FormControlLabel, Snackbar, Alert } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import { useTheme } from '@mui/material/styles';
 import axios from '../axiosConfig';
+import { ColorModeContext } from '../index';
+
 
 const Settings = () => {
+  const theme = useTheme();
+  const colorMode = useContext(ColorModeContext);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -61,6 +67,14 @@ const Settings = () => {
             <FormControlLabel
               control={<Switch checked={notifEnabled} onChange={e => setNotifEnabled(e.target.checked)} />}
               label="دریافت اعلان‌های ایمیلی (غیرفعال/آزمایشی)"
+            />
+          </Box>
+          <Divider sx={{ my: 2 }} />
+          <Box>
+            <Typography variant="subtitle1" fontWeight={700} gutterBottom><Brightness4Icon sx={{ verticalAlign: 'middle', mr: 1 }} /> تم برنامه</Typography>
+            <FormControlLabel
+              control={<Switch checked={theme.palette.mode === 'dark'} onChange={colorMode.toggleColorMode} />}
+              label={theme.palette.mode === 'dark' ? 'تم تاریک' : 'تم روشن'}
             />
           </Box>
         </Stack>

@@ -2,7 +2,6 @@ import React from 'react';
 import TaskManager from '../components/TaskManager';
 import DailyPhoto from '../components/DailyPhoto';
 import MoodTracker from '../components/MoodTracker';
-import GroupChallenge from '../components/GroupChallenge';
 import Analytics from '../components/Analytics';
 import { Grid, Paper, Typography, Box } from '@mui/material';
 
@@ -14,7 +13,7 @@ const Dashboard = () => (
     <Grid container spacing={3}>
       <Grid item xs={12} md={6}>
         <Paper elevation={3} sx={{p:2, mb:2}}>
-          <TaskManager />
+          <TaskManager showOnlyToday={true} showAddTaskForm={false} />
         </Paper>
         <Paper elevation={3} sx={{p:2, mb:2}}>
           <MoodTracker />
@@ -23,9 +22,6 @@ const Dashboard = () => (
       <Grid item xs={12} md={6}>
         <Paper elevation={3} sx={{p:2, mb:2}}>
           <Analytics />
-        </Paper>
-        <Paper elevation={3} sx={{p:2, mb:2}}>
-          <GroupChallenge />
         </Paper>
         <Paper elevation={3} sx={{p:2, mb:2}}>
           <DailyPhoto />

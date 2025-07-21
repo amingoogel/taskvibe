@@ -1,5 +1,5 @@
 import React from 'react';
-import Auth from '../components/Auth';
+import LoginForm from '../components/LoginForm';
 import { Box, Typography, Paper, Button } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,7 +23,7 @@ const Login = () => {
         <Typography align="center" sx={{mb:2}}>
           لطفاً وارد حساب کاربری خود شوید
         </Typography>
-        <Auth setIsAuthenticated={() => dispatch(setAuthenticated(true))} />
+        <LoginForm setIsAuthenticated={() => dispatch(setAuthenticated(true))} />
         <Button component={Link} to="/register" fullWidth sx={{mt:2}}>
           حساب کاربری ندارید؟ ثبت‌نام کنید
         </Button>

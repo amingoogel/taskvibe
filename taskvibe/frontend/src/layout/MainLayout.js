@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Box, CssBaseline, IconButton, useTheme, useMediaQuery } from '@mui/material';
+import { AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Box, CssBaseline, IconButton, useTheme, useMediaQuery, Divider } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import AssignmentIcon from '@mui/icons-material/Assignment';
@@ -9,7 +9,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import SettingsIcon from '@mui/icons-material/Settings';
+import GroupsIcon from '@mui/icons-material/Groups';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { ColorModeContext } from '../index';
+import { useDispatch } from 'react-redux';
+import { logout } from '../store/userSlice';
 
 const drawerWidth = 220;
 
@@ -17,6 +21,7 @@ const navItems = [
   { text: 'داشبورد', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'تسک‌ها', icon: <AssignmentIcon />, path: '/tasks' },
   { text: 'تقویم', icon: <CalendarMonthIcon />, path: '/calendar' },
+  { text: 'گروه‌ها و چالش‌ها', icon: <GroupsIcon />, path: '/groups' },
   { text: 'پروفایل', icon: <AccountCircleIcon />, path: '/profile' },
   { text: 'تنظیمات', icon: <SettingsIcon />, path: '/settings' },
 ];
@@ -27,10 +32,15 @@ const MainLayout = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const colorMode = useContext(ColorModeContext);
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
   const drawer = (
-    <Box sx={{ overflow: 'auto' }}>
-      <List>
+    <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <List sx={{flexGrow:1}}>
         {navItems.map((item) => (
           <ListItem
             button
@@ -45,6 +55,11 @@ const MainLayout = () => {
           </ListItem>
         ))}
       </List>
+      <Divider />
+      <ListItem button onClick={handleLogout}>
+        <ListItemIcon><LogoutIcon color="error" /></ListItemIcon>
+        <ListItemText primary="خروج" />
+      </ListItem>
     </Box>
   );
 

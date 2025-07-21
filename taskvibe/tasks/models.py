@@ -5,29 +5,30 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 class Task(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
-    completed = models.BooleanField(default=False)
-    energy_level = models.CharField(max_length=20, choices=[
+    PRIORITY_CHOICES = [
         ('LOW', 'Low'),
         ('MEDIUM', 'Medium'),
         ('HIGH', 'High'),
-    ])
-    priority = models.CharField(max_length=10, choices=[
-        ('LOW', 'Low'),
-        ('MEDIUM', 'Medium'),
-        ('HIGH', 'High'),
-    ], default='MEDIUM')
-    tags = models.CharField(max_length=200, blank=True, help_text='Comma-separated tags')
-    recurring = models.CharField(max_length=10, choices=[
+    ]
+    RECURRING_CHOICES = [
         ('NONE', 'None'),
         ('DAILY', 'Daily'),
         ('WEEKLY', 'Weekly'),
         ('MONTHLY', 'Monthly'),
-    ], default='NONE')
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     due_date = models.DateTimeField(null=True, blank=True)
+    energy_level = models.CharField(max_length=10, choices=[('LOW', 'Low'), ('MEDIUM', 'Medium'), ('HIGH', 'High')], default='MEDIUM')
+    
+    # New fields
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='MEDIUM')
+    tags = models.CharField(max_length=255, blank=True, help_text="Comma-separated tags")
+    recurring = models.CharField(max_length=10, choices=RECURRING_CHOICES, default='NONE')
 
     def __str__(self):
         return self.title

@@ -1,5 +1,5 @@
 import React from 'react';
-import Auth from '../components/Auth';
+import RegisterForm from '../components/RegisterForm';
 import { Box, Typography, Paper, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -16,7 +16,7 @@ const Register = () => {
         <Typography align="center" sx={{mb:2}}>
           برای ساخت حساب جدید فرم زیر را پر کنید
         </Typography>
-        <Auth setIsAuthenticated={() => dispatch(setAuthenticated(true))} />
+        <RegisterForm setIsAuthenticated={() => dispatch(setAuthenticated(true))} />
         <Button component={Link} to="/login" fullWidth sx={{mt:2}}>
           قبلاً ثبت‌نام کرده‌اید؟ وارد شوید
         </Button>

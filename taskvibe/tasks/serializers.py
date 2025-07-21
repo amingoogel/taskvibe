@@ -16,7 +16,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ['id', 'title', 'description', 'completed', 'energy_level', 'priority', 'tags', 'recurring', 'created_at', 'due_date']
+        fields = ['id', 'title', 'description', 'completed', 'created_at', 'due_date', 'energy_level', 'priority', 'tags', 'recurring']
+        read_only_fields = ['user']
 
 class DailyPhotoSerializer(serializers.ModelSerializer):
     photo = serializers.ImageField(max_length=None, use_url=True)
@@ -31,10 +32,14 @@ class MoodSerializer(serializers.ModelSerializer):
         fields = ['id', 'mood', 'recorded_at']
 
 class GroupSerializer(serializers.ModelSerializer):
-    members = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    members = UserProfileSerializer(many=True, read_only=True)
+    member_ids = serializers.PrimaryKeyRelatedField(
+        many=True, write_only=True, queryset=User.objects.all(), source='members'
+    )
+
     class Meta:
         model = Group
-        fields = ['id', 'name', 'members', 'created_at']
+        fields = ['id', 'name', 'members', 'created_at', 'member_ids']
 
 class ChallengeSerializer(serializers.ModelSerializer):
     class Meta:

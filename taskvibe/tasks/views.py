@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -6,6 +6,10 @@ from .models import Task, DailyPhoto, Mood, Group, Challenge, Message
 from .serializers import TaskSerializer, DailyPhotoSerializer, MoodSerializer, GroupSerializer, ChallengeSerializer, MessageSerializer
 from .notifications import send_task_reminder, send_challenge_update
 from rest_framework.views import APIView
+from django.contrib.auth import get_user_model
+from .serializers import UserProfileSerializer
+
+User = get_user_model()
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
@@ -60,6 +64,25 @@ class GroupViewSet(viewsets.ModelViewSet):
         group = serializer.save()
         group.members.add(self.request.user)
 
+    @action(detail=True, methods=['post'])
+    def manage_members(self, request, pk=None):
+        group = self.get_object()
+        user_ids = request.data.get('user_ids', [])
+        
+        # اطمینان از اینکه کاربر درخواست‌دهنده مدیر گروه است (در اینجا ساده‌سازی شده)
+        # if request.user != group.creator:
+        #     return Response({'error': 'Only the group admin can manage members'}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            users = User.objects.filter(id__in=user_ids)
+            group.members.set(users)
+            # همیشه کاربر فعلی را در گروه نگه دار
+            group.members.add(request.user)
+            return Response(GroupSerializer(group).data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 class ChallengeViewSet(viewsets.ModelViewSet):
     queryset = Challenge.objects.all()
     serializer_class = ChallengeSerializer
@@ -92,6 +115,18 @@ class ChallengeViewSet(viewsets.ModelViewSet):
                 'progress_percentage': (completed_tasks / challenge.target_tasks * 100) if challenge.target_tasks > 0 else 0
             })
         return Response(progress)
+
+class UserSearchView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        query = request.query_params.get('q', '')
+        if len(query) < 2:
+            return Response([])
+        users = User.objects.filter(username__icontains=query).exclude(id=request.user.id)
+        serializer = UserProfileSerializer(users, many=True)
+        return Response(serializer.data)
+
 
 class GroupMessagesView(APIView):
     permission_classes = [IsAuthenticated]
