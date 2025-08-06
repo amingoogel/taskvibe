@@ -65,7 +65,10 @@ ROOT_URLCONF = 'taskvibe.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'taskvibe', 'frontend')],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'taskvibe', 'frontend'),
+            os.path.join(BASE_DIR, 'taskvibe', 'templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

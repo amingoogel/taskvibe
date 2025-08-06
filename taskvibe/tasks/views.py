@@ -41,6 +41,33 @@ class DailyPhotoViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    @action(detail=False, methods=['get', 'post', 'put'], url_path='by-date')
+    def by_date(self, request):
+        date = request.data.get('date') or request.query_params.get('date')
+        if not date:
+            return Response({'error': 'date is required'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            photo_obj = DailyPhoto.objects.get(user=request.user, date=date)
+        except DailyPhoto.DoesNotExist:
+            photo_obj = None
+
+        if request.method in ['POST', 'PUT']:
+            data = request.data.copy()
+            data['date'] = date
+            if photo_obj:
+                serializer = self.get_serializer(photo_obj, data=data, partial=True)
+            else:
+                serializer = self.get_serializer(data=data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(user=request.user)
+            return Response(serializer.data)
+        else:  # GET
+            if photo_obj:
+                serializer = self.get_serializer(photo_obj)
+                return Response(serializer.data)
+            else:
+                return Response({'detail': 'No photo for this date.'}, status=status.HTTP_404_NOT_FOUND)
+
 class MoodViewSet(viewsets.ModelViewSet):
     queryset = Mood.objects.all()
     serializer_class = MoodSerializer

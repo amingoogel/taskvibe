@@ -30,8 +30,8 @@ const Main = () => {
   const theme = useMemo(() => createTheme({
     palette: {
       mode,
-      primary: { main: '#10B981' },
-      secondary: { main: '#6366F1' },
+      primary: { main: '#8B5CF6' },
+      secondary: { main: '#A855F7' },
       background: {
         default: mode === 'light' ? '#f3f4f6' : '#18181b',
         paper: mode === 'light' ? '#fff' : '#27272a',

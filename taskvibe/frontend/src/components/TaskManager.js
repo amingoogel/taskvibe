@@ -230,7 +230,13 @@ function TaskManager() {
                     </Tooltip>
                   )
                 }
-                sx={{ mb: 1, bgcolor: task.completed ? 'success.light' : 'grey.100', borderRadius: 2 }}
+                sx={{ 
+                  mb: 1, 
+                  bgcolor: task.completed ? 'success.light' : 'background.default', 
+                  borderRadius: 2,
+                  border: 1,
+                  borderColor: 'divider'
+                }}
               >
                 <ListItemIcon>
                   {task.completed ? <CheckCircleIcon color="success" /> : <RadioButtonUncheckedIcon color="disabled" />}

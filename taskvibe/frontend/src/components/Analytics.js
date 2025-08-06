@@ -50,7 +50,7 @@ function Analytics() {
         analytics.daily_report.completed_tasks,
         analytics.daily_report.total_tasks - analytics.daily_report.completed_tasks
       ],
-      backgroundColor: ['#10B981', '#EF4444']
+      backgroundColor: ['#8B5CF6', '#EF4444']
     }]
   };
 
@@ -74,7 +74,13 @@ function Analytics() {
           <Typography color="text.secondary" align="center" sx={{ my: 2 }}>پیشنهادی وجود ندارد.</Typography>
         ) : analytics.suggestions.map((suggestion, index) => (
           <Fade in timeout={400 + index * 50} key={index}>
-            <ListItem sx={{ bgcolor: 'grey.100', borderRadius: 2, mb: 1 }}>
+            <ListItem sx={{ 
+              bgcolor: 'background.default', 
+              borderRadius: 2, 
+              mb: 1,
+              border: 1,
+              borderColor: 'divider'
+            }}>
               <ListItemIcon>
                 <Tooltip title="پیشنهاد هوشمند" arrow>
                   <EmojiObjectsIcon color="warning" />

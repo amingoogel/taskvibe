@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../axiosConfig';
+import { Box, Typography, TextField, Button, Input } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Tooltip from '@mui/material/Tooltip';
 import Fade from '@mui/material/Fade';
@@ -12,17 +13,18 @@ function DailyPhoto({ date }) {
   const [uploading, setUploading] = useState(false);
 
   const effectiveDate = date || new Date();
+  const dateString = effectiveDate.toISOString().slice(0, 10);
 
   useEffect(() => {
     setLoading(true);
-    // Use effectiveDate which defaults to today
-    axios.get('http://localhost:8000/api/photos/', { params: { date: effectiveDate.toISOString().slice(0, 10) } })
+    axios.get('http://localhost:8000/api/photos/by-date/', { params: { date: dateString } })
       .then(response => {
-        if (response.data.length > 0) setDailyPhoto(response.data[0]);
-        else setDailyPhoto(null);
+        setDailyPhoto(response.data);
+        setMood(response.data.mood || '');
       })
+      .catch(() => setDailyPhoto(null))
       .finally(() => setLoading(false));
-  }, [date]); // Keep dependency on `date` prop to refetch when it changes
+  }, [date]);
 
   const handleUploadPhoto = async () => {
     if (!photo) return;
@@ -30,15 +32,14 @@ function DailyPhoto({ date }) {
     const formData = new FormData();
     formData.append('photo', photo);
     formData.append('mood', mood);
-    // Use effectiveDate here as well
-    formData.append('date', effectiveDate.toISOString().slice(0, 10));
+    formData.append('date', dateString);
     try {
-      const response = await axios.post('http://localhost:8000/api/photos/', formData, {
+      const response = await axios.post('http://localhost:8000/api/photos/by-date/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setDailyPhoto(response.data);
       setPhoto(null);
-      setMood('');
+      setMood(response.data.mood || '');
     } catch (error) {
       alert('Failed to upload photo');
     } finally {
@@ -47,40 +48,60 @@ function DailyPhoto({ date }) {
   };
 
   return (
-    <div className="card">
-      <h2 className="text-2xl font-semibold mb-4">عکس روز {effectiveDate.toLocaleDateString('fa-IR')}</h2>
+    <Box sx={{ bgcolor: 'background.paper', borderRadius: 3, boxShadow: 3, p: 3, mb: 3 }}>
+      <Typography variant="h6" fontWeight={700} gutterBottom>
+        عکس روز {effectiveDate.toLocaleDateString('fa-IR')}
+      </Typography>
       <Tooltip title="آپلود عکس روزانه" arrow>
-        <input
+        <Input
           type="file"
           onChange={e => setPhoto(e.target.files[0])}
-          className="mb-2"
+          sx={{ mb: 2 }}
+          fullWidth
         />
       </Tooltip>
-      <input
+      <TextField
         type="text"
         value={mood}
         onChange={e => setMood(e.target.value)}
         placeholder="حس و حال شما"
-        className="border p-2 mb-2 w-full rounded"
+        fullWidth
+        sx={{ mb: 2 }}
       />
-      <button onClick={handleUploadPhoto} className="bg-green-500 text-white p-2 rounded w-full" disabled={uploading || !photo}>
+      <Button 
+        onClick={handleUploadPhoto} 
+        variant="contained" 
+        color="primary" 
+        fullWidth 
+        disabled={uploading || !photo}
+      >
         {uploading ? 'در حال آپلود...' : 'آپلود عکس'}
-      </button>
+      </Button>
       {loading ? (
-        <div className="flex justify-center items-center my-4"><CircularProgress /></div>
+        <Box display="flex" justifyContent="center" alignItems="center" sx={{ my: 2 }}>
+          <CircularProgress />
+        </Box>
       ) : !dailyPhoto ? (
-        <div className="text-center text-gray-500 my-4">عکسی برای این روز ثبت نشده است.</div>
+        <Typography color="text.secondary" align="center" sx={{ my: 2 }}>
+          عکسی برای این روز ثبت نشده است.
+        </Typography>
       ) : (
         <Fade in timeout={500}>
-          <div className="mt-4">
+          <Box sx={{ mt: 2 }}>
             <Tooltip title="عکس روزانه شما" arrow>
-              <img src={dailyPhoto.photo} alt="Daily Photo" className="max-w-xs rounded" />
+              <img 
+                src={dailyPhoto.photo} 
+                alt="Daily Photo" 
+                style={{ maxWidth: '300px', borderRadius: '8px' }} 
+              />
             </Tooltip>
-            <p className="mt-2">حس و حال: {dailyPhoto.mood}</p>
-          </div>
+            <Typography sx={{ mt: 2 }}>
+              حس و حال: {dailyPhoto.mood}
+            </Typography>
+          </Box>
         </Fade>
       )}
-    </div>
+    </Box>
   );
 }
 

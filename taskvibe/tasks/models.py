@@ -35,12 +35,16 @@ class Task(models.Model):
 
 class DailyPhoto(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField()
     photo = models.ImageField(upload_to='daily_photos/%Y/%m/%d/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     mood = models.CharField(max_length=50, blank=True)
 
+    class Meta:
+        unique_together = ('user', 'date')
+
     def __str__(self):
-        return f"Photo for {self.user.username} on {self.uploaded_at}"
+        return f"Photo for {self.user.username} on {self.date}"
 
 class Mood(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

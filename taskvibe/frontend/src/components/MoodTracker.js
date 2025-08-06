@@ -93,7 +93,13 @@ function MoodTracker() {
             const opt = getMoodOption(moodObj.mood);
             return (
               <Fade in timeout={400 + i * 50} key={moodObj.id}>
-                <ListItem sx={{ bgcolor: 'grey.100', borderRadius: 2, mb: 1 }}>
+                <ListItem sx={{ 
+                  bgcolor: 'background.default', 
+                  borderRadius: 2, 
+                  mb: 1,
+                  border: 1,
+                  borderColor: 'divider'
+                }}>
                   <ListItemIcon>
                     <Tooltip title={opt?.label || moodObj.mood} arrow>
                       {opt?.icon || <MoodIcon />}

@@ -326,7 +326,13 @@ function GroupChallenge() {
       </Typography>
       <List>
         {challenges.map(challenge => (
-          <ListItem key={challenge.id} sx={{ bgcolor: 'grey.100', borderRadius: 2, mb: 1 }}>
+          <ListItem key={challenge.id} sx={{ 
+  bgcolor: 'background.default', 
+  borderRadius: 2, 
+  mb: 1,
+  border: 1,
+  borderColor: 'divider'
+}}>
             <ListItemIcon><EmojiEventsIcon color="warning" /></ListItemIcon>
             <ListItemText
               primary={challenge.title}
@@ -346,7 +352,13 @@ function GroupChallenge() {
       </Typography>
       <List>
         {challengeUpdates.map((update, index) => (
-          <ListItem key={index} sx={{ bgcolor: 'grey.100', borderRadius: 2, mb: 1 }}>
+          <ListItem key={index} sx={{ 
+  bgcolor: 'background.default', 
+  borderRadius: 2, 
+  mb: 1,
+  border: 1,
+  borderColor: 'divider'
+}}>
             <ListItemIcon><UpdateIcon color="info" /></ListItemIcon>
             <ListItemText
               primary={`کاربر ${update.user_id} ${update.completed_tasks} تسک انجام داد`}
@@ -368,7 +380,16 @@ function GroupChallenge() {
           {chatMessages.map((msg, i) => (
             <Fade in timeout={400 + i * 50} key={i}>
               <Box sx={{ mb: 1, display: 'flex', flexDirection: 'column', alignItems: msg.user === localStorage.getItem('username') ? 'flex-end' : 'flex-start' }}>
-                <Box sx={{ bgcolor: msg.user === localStorage.getItem('username') ? 'primary.light' : 'grey.200', color: 'text.primary', px: 2, py: 1, borderRadius: 2, maxWidth: '80%' }}>
+                <Box sx={{ 
+  bgcolor: msg.user === localStorage.getItem('username') ? 'primary.light' : 'background.default', 
+  color: 'text.primary', 
+  px: 2, 
+  py: 1, 
+  borderRadius: 2, 
+  maxWidth: '80%',
+  border: 1,
+  borderColor: 'divider'
+}}>
                   <Typography variant="body2" fontWeight={700}>{msg.user}</Typography>
                   <Typography variant="body1">{msg.content}</Typography>
                   <Typography variant="caption" color="text.secondary">{new Date(msg.timestamp).toLocaleTimeString('fa-IR')}</Typography>

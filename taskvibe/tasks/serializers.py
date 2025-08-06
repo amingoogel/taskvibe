@@ -21,10 +21,11 @@ class TaskSerializer(serializers.ModelSerializer):
 
 class DailyPhotoSerializer(serializers.ModelSerializer):
     photo = serializers.ImageField(max_length=None, use_url=True)
+    date = serializers.DateField()
 
     class Meta:
         model = DailyPhoto
-        fields = ['id', 'photo', 'mood', 'uploaded_at']
+        fields = ['id', 'photo', 'mood', 'uploaded_at', 'date']
 
 class MoodSerializer(serializers.ModelSerializer):
     class Meta:

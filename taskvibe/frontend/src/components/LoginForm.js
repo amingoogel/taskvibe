@@ -12,6 +12,7 @@ function LoginForm({ setIsAuthenticated }) {
       const response = await axios.post('http://localhost:8000/api/login/', loginData);
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('user_id', response.data.user_id);
+      localStorage.setItem('username', loginData.username);
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
       setIsAuthenticated(true);
       setLoginData({ username: '', password: '' });

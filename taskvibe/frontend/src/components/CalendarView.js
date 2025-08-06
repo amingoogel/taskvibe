@@ -140,7 +140,7 @@ function CalendarView() {
         selectable
         eventPropGetter={(event) => ({
           style: {
-            backgroundColor: event.completed ? '#10B981' : '#3B82F6',
+            backgroundColor: event.completed ? '#8B5CF6' : '#3B82F6',
             color: 'white',
             borderRadius: 8,
             fontWeight: 700,
@@ -224,7 +224,13 @@ function CalendarView() {
                       </Button>
                     )
                   }
-                  sx={{ mb: 1, bgcolor: task.completed ? 'success.light' : 'grey.100', borderRadius: 2 }}
+                  sx={{ 
+                    mb: 1, 
+                    bgcolor: task.completed ? 'success.light' : 'background.default', 
+                    borderRadius: 2,
+                    border: 1,
+                    borderColor: 'divider'
+                  }}
                 >
                   <ListItemIcon>
                     {task.completed ? <CheckCircleIcon color="success" /> : <RadioButtonUncheckedIcon color="disabled" />}
